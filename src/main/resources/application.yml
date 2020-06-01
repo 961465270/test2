@@ -1,0 +1,42 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /qdu
+
+## 修改Thymeleaf缓存为false
+spring:
+  thymeleaf:
+    cache: false
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/etoak?serverTimezone=GMT
+    username: root
+    password: etoak
+    hikari:
+      maximum-pool-size: 20
+  servlet:
+      multipart:
+        max-file-size: 2MB
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+
+# 整合MyBatis
+mybatis:
+  type-aliases-package: com.qdu.test.bean
+  mapper-locations: classpath:/mappers/*.xml
+
+## PageHelper
+pagehelper:
+  reasonable: true
+  helper_dialect: mysql
+
+logging:
+  level:
+    com.etoak.mapper: debug
+file:
+  location: d:/upload/
+  mapping: /pics/**
+  savePrefix: /pics/

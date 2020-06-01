@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qdu.test.mapper.FoodMapper">
+
+    <insert id="addFood" parameterType="food">
+        INSERT INTO food (
+        id,
+        name,
+        user_name,
+        type,
+        pic,
+        introduce,
+        way
+        ) VALUES (
+        #{id},
+        #{name},
+        #{userName},
+        #{type},
+        #{pic},
+        #{introduce},
+        #{way}
+        )
+    </insert>
+    <select id="queryList" parameterType="Food" resultType="Food">
+        select id,
+        name,
+        user_name as userName,
+        type,
+        pic,
+        introduce,
+        way
+        from food
+        <where>
+            <if test="name !=null and name !=''">
+                and name LIKE "%"#{name}"%"
+            </if>
+            <if test="userName !=null and userName!=''">
+                and user_name = #{userName}
+            </if>
+            <if test="type != null and type !=''">
+                and type = #{type}
+            </if>
+        </where>
+    </select>
+    <select id="queryPing"  resultType="Ping">
+        SELECT id,
+        food_id as foodId,
+        user_name as userName,
+        food_text as foodText
+        from ping
+        WHERE food_id = #{foodId}
+    </select>
+    <insert id="insert" parameterType="Ping">
+        INSERT into ping(
+        id,
+        food_id,
+        user_name,
+        food_text
+        )VALUES (
+        #{id},
+        #{foodId},
+        #{userName},
+        #{foodText}
+        )
+    </insert>
+</mapper>

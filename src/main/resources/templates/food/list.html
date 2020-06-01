@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>列表页</title>
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+
+
+</head>
+<body>
+<!--查询面板-->
+<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-info">
+        <div class="panel-heading" role="tab" id="headingOne">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    查询
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+            <div class="panel-body">
+                <form class="form-horizontal" role="form">
+                    <!-- 菜品类型:单选 -->
+                    <div class="form-group">
+                        <label for="type" class="col-sm-1 control-label">方式</label>
+                        <div class="col-sm-6" id="type">
+                            <label class="radio-inline" >
+                                <input type="radio"  name="type" value="" checked> 不限
+                            </label>
+
+                            <label class="radio-inline" >
+                                <input type="radio"  name="type" value="鲁菜" > 鲁菜
+                            </label>
+
+                            <label class="radio-inline" >
+                                <input type="radio"  name="type" value="粤菜" > 粤菜
+                            </label>
+
+                            <label class="radio-inline" >
+                                <input type="radio"  name="type" value="川菜" > 川菜
+                            </label>
+
+                            <label class="radio-inline" >
+                                <input type="radio"  name="type" value="淮扬菜" > 淮扬菜
+                            </label>
+
+                        </div>
+                    </div>
+                    <!--菜名:模糊查询-->
+                    <div class="form-group">
+                        <label for="name" class="col-sm-1 control-label">菜名</label>
+                        <div class="col-sm-7" id="name">
+                            <label class="radio-inline" >
+                                <input type="text"  name="name" value="" >
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button id="queryButton" type="button" class="btn btn-primary">查询</button>
+                            <button type="reset" class="btn btn-success">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--菜品展示-->
+    <table id="foodDate"></table>
+<!--评论model-->
+<div id="foodModel" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!--展示区-->
+            <h3>用户评论</h3>
+            <div class="panel panel-default" id="ping">
+                <div class="panel-heading">
+                </div>
+                <div class="panel-body">
+                    还没有人评论呢
+                </div>
+            </div>
+            <form class="form-horizontal" role="form" th:action="@{/food/insert}">
+                <input type="hidden" id="foodId" name="foodId">
+                <input type="hidden" id="userName" name="userName" th:value="${session.user.getName()}">
+
+                <!--新增区-->
+                <div class="form-group">
+                    <label for="foodText" class="col-sm-1 control-label"></label>
+                    <div class="col-sm-7" id="foodText">
+                        <label class="input-group input-group-lg" >
+                            <input type="text" placeholder="我也来写评论..." class="form-control" name="foodText">
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button  type="submit" class="btn btn-primary">提交</button>
+                        <button type="reset" class="btn btn-success" data-dismiss="modal">取消</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/jquery/jquery.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/bootstrap/table/bootstrap-table.min.js}"></script>
+<script th:src="@{/bootstrap/table/bootstrap-table-zh-CN.min.js}"></script>
+    <script th:inline="javascript" type="text/javascript">
+        const path= [[${#request.getContextPath()}]];
+        $(function () {
+            $('#foodDate').bootstrapTable('destroy');
+            qdu.queryList();
+            $('#queryButton').click(function () {
+                $('#foodDate').bootstrapTable('refresh');
+            });
+        });
+        let qdu = {
+            queryList:function () {
+                $('#foodDate').bootstrapTable({
+                    url:path+'/food/list',
+                    sidePagination:'server',
+                    pagination:true,
+                    pageNumber:1,
+                    pageSize:2,
+                    pageList:[2,4,8,10,15,20],
+                    queryParamsType:'undefined',
+                    paginationPreText:'上一页',
+                    paginationNextText:'下一页',
+                    cache : false,
+                    queryParams:function (params) {
+                        let type = $("input[name='type']:checked").val();
+                        let name = $("input[name='name']").val();
+                        let newParam = {
+                            pageNum: params.pageNumber,
+                            pageSize: params.pageSize,
+                            type: type,
+                            name: name,
+                        };
+                        return newParam;
+                    },
+                    columns:[
+                        {field:'id',title:'编号'},
+                        {field:'name',title:'菜名'},
+                        {field:'userName',title:'发布用户'},
+                        {field:'type',title:'类型'},
+                        {field:'introduce',title:'介绍'},
+                        {field:'way',title:'做法'},
+                        {title:'图片',formatter:function (value,row,index) {
+                            return "<img src='"+path + row.pic+"' width='50px' height='50px'>"
+                            }
+                        },
+                        {title:'操作',formatter:function (value,row,index) {
+                            let del = "<button type='button' class='btn btn-danger' id='del'>查看评论</button>";
+                            return  del;
+                            },
+                            events: usersEvent
+                        }]
+
+                })
+            },
+            queryPing:function (foodId) {
+                $.ajax({
+                    url:path+'/food/ping',
+                    type:'post',
+                    data:'foodId='+foodId,
+                    dataType:'json',
+                    success:function (res) {
+
+                        let option =  '';
+
+                        $.each(res,function (index,dict) {
+                            option+="<div class='panel-heading'>"
+                                +dict.userName+":"+ dict.foodText+"</div>" /*+
+                                "<div class='panel-body'>"
+                            +dict.foodText+
+                            "</div>"*/
+                            /* option+="<option value='"+dict.value+"'>"
+                             +dict.name+"</option>"*/
+                        });
+
+                        $('#ping').html(option);
+
+                    }
+                })
+            }
+        }
+        window.usersEvent = {
+            'click #del':function (event,value,row,index) {
+
+                $('#foodModel').modal('show');
+
+
+                const foodId = row.id;
+                //根据菜名查询,查出书写用户,评论内容
+               // querySelectDict:function (foodName) {
+                 qdu.queryPing(foodId);
+                 $('#foodId').val(row.id);
+                 /*$('#userName').val()*/
+                 }
+
+
+                 //给新增框提交表单,新增评论
+
+
+
+
+            //}
+        }
+    </script>
+</body>
+</html>

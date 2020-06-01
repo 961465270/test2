@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>用户添加</title>
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+<body>
+<form id="addUsers" th:action="@{/users/add}" method="post" class="form-horizontal" role="form">
+    <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">姓名</label>
+        <div class="col-sm-6 input-group">
+            <input type="text" name="name" class="form-control" id="name" placeholder="姓名">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="password" class="col-sm-2 control-label">密码</label>
+        <div class="col-sm-6 input-group">
+            <input type="password" name="password" class="form-control" id="password" placeholder="密码">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="age" class="col-sm-2 control-label">年龄</label>
+        <div class="col-sm-6 input-group">
+            <input type="text" name="age" class="form-control" id="age" placeholder="年龄">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="gend" class="col-sm-2 control-label">性别</label>
+        <div class="col-sm-6 input-group"  id="gend">
+           <label><input type="radio" name="gend" class="form-control" value="男">男生</label>
+           <label><input type="radio" name="gend" class="form-control" value="女">女生</label>
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="hobby" class="col-sm-2 control-label">爱好</label>
+        <div class="col-sm-6 input-group">
+            <input type="text" name="hobby" class="form-control" id="hobby" placeholder="爱好">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary">注册</button>
+        </div>
+    </div>
+
+</form>
+<script th:src="@{/jquery/jquery.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/jquery/jquery.validate.min.js}"></script>
+<script th:src="@{/jquery/messages_zh.min.js}"></script>
+<script th:inline="javascript" type="text/javascript">
+    const path = [[${#request.getContextPath()}]];
+    $(function () {
+        $('#addUsers').validate({
+
+            errorElement:'div',
+            errorPlacement:function (error, element) {
+                error.addClass('input-group-addon');
+                error.appendTo(element.parent())
+            },
+            success:function (div) {
+                div.addClass('success input-group-addon').text('OK');
+            },
+            rules:{
+                name:{
+                    required:true,
+                    remote:{
+                        url:path + '/users/checkUsers',
+                        type:'post'
+                    }
+                },
+                password:{required:true},
+                age:{required:true},
+                gend:{required:true},
+                hobby:{required:true}
+
+            },
+            message:{
+                name:{
+                    required:'名字必填',
+                    remote:'请修正此栏位'
+                },
+                password:{required:'密码必填'},
+                age:{required:'年龄必填'},
+                gend:{requied:'性别必填'},
+                hobby:{required:'爱好必填'}
+            }
+        });
+    })
+
+
+
+</script>
+
+</body>
+</html>

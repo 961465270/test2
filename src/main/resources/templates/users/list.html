@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>用户列表</title>
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/bootstrap/table/bootstrap-table.min.css}" rel="stylesheet">
+</head>
+<body>
+
+<table id="usersTable" class="table table-bordered table-hover"></table>
+
+<!--删除房源表单,rest方式-->
+<form method="post" id="delForm">
+    <input type="hidden" name="_method" value="DELETE">
+</form>
+
+<script th:src="@{/jquery/jquery.min.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+<script th:src="@{/bootstrap/table/bootstrap-table.min.js}"></script>
+<script th:src="@{/bootstrap/table/bootstrap-table-zh-CN.min.js}"></script>
+<script th:inline="javascript">
+    const path = [[${#request.getContextPath()}]];
+    let usersTable;
+    $(function () {
+        let user = new Users;
+        user.queryUsers();
+    });
+    function Users() {}
+    Users.prototype.queryUsers = function () {
+        usersTable = $('#usersTable').bootstrapTable({
+            url:path+'/users/list',
+            sidePagination: 'server',
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 5,
+            pageList:[2,4,8,10,15,20],
+            queryParamsType: "undefined",
+            paginationPreText: '上一页',
+            paginationNextText: '下一页',
+            queryParams:function (params) {
+
+                let newParam = {
+                    pageNum: params.pageNumber,
+                    pageSize: params.pageSize,
+
+                };
+                return newParam;
+            },
+            columns:[
+                {field:"id",title:"ID"},
+                {field:"name",title:"姓名"},
+                {field:"age",title:"年龄"},
+                {field:"hobby",title:"爱好"},
+                {field:"level",title:"级别"},
+                {title:"删除",
+                    formatter: function (value, row, index) {
+                    /*var update = "<button type='button' class='btn btn-primary' id='update' >修改</button>";*/
+                    let del = "<button type='button' class='btn btn-danger' id='del'>删除</button>";
+                    return  del;
+                    },
+                    events: usersEvent,
+                }]
+        });
+    }
+    window.usersEvent = {
+        'click #del':function (event,value,row,index) {
+            let action = path + '/users/' + row.id;
+            //不明白
+            $('#delForm').attr('action',action).submit();
+        }
+    }
+</script>
+
+</body>

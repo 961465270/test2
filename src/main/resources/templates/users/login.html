@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+<title>登录页面</title>
+</head>
+<body>
+	
+	<!-- Modal -->
+	<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+	        <h4 class="modal-title" id="myModalLabel">登陆</h4>
+	      </div>
+	      <div class="modal-body">
+			
+			<form   id="login" role="form"  method="POST" th:action="@{/users/login}">
+				<div class="form-group">
+					<label for="name" class="col-sm-2 control-label">姓名</label>
+					<div class="col-sm-6 input-group">
+						<input type="text" name="name" class="form-control" id="name" placeholder="姓名">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="password" class="col-sm-2 control-label">密码</label>
+					<div class="col-sm-6 input-group">
+						<input type="password" name="password" class="form-control" id="password" placeholder="密码">
+					</div>
+				</div>
+				<div class="form-group" >
+					<input with="300px" type="text" id="verifyCode" name="verifyCode" 
+					       class="form-control" placeholder="验证码" >
+					<img onclick="changeCode()" id="pic" 
+					th:src="@{/verifyCode}"  />
+				</div>
+				<a href="/qdu/users/to_add" class="btn btn-primary">立即注册</a>
+				<!-- 显示错误信息 -->
+				
+				<span style="color:red" th:text="${error}"></span>
+				
+				<input id="submit" type="submit" value="登陆" class="btn btn-primary" />
+			</form>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+
+	<script th:src="@{/jquery/jquery.min.js}"></script>
+	<script th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+	<script th:src="@{/jquery/jquery.validate.min.js}"></script>
+	<script th:src="@{/jquery/messages_zh.min.js}"></script>
+<script th:inline="javascript" type="text/javascript">
+	const contextPath = [[${#request.getContextPath()}]];
+	$('#loginModal').modal('show');
+
+
+
+	$('#login').validate({
+        errorElement:'div',
+        errorPlacement:function (error, element) {
+            error.addClass('input-group-addon');
+            error.appendTo(element.parent())
+        },
+        /*success:function (div) {
+            div.addClass('success input-group-addon').text('OK');
+        },*/
+		rules:{
+            name:{
+                required:true
+			},
+			password:{
+                required:true,
+
+			},
+            verifyCode:{
+                required:true,
+
+			}
+		},
+		message:{
+            name:{required:'用户名必填'},
+			password:{
+                required:'密码必填',
+			},
+			verifyCode:{
+                required:'验证码必填',
+			}
+		}
+	});
+
+
+	function changeCode(){
+		$('#pic').attr('src', contextPath +"/verifyCode?"+new Date().getTime());
+	}
+
+	if(top != window) {
+	   top.location.href = window.location.href;
+	}
+</script>
+</body>
+</html>
